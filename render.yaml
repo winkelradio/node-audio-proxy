@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: node-audio-proxy
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        fromService:
+          name: node-audio-proxy
+          key: port
