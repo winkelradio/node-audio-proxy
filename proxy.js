@@ -11,19 +11,20 @@ app.get('/proxy', (req, res) => {
 
     const client = targetUrl.startsWith('https') ? https : http;
 
+    // ✅ Zet CORS headers vóór je iets doorstuurt
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+
     const proxyReq = client.get(targetUrl, proxyRes => {
         res.setHeader('Content-Type', proxyRes.headers['content-type'] || 'audio/mpeg');
         proxyRes.pipe(res);
     });
 
     req.on('close', () => {
-        proxyReq.destroy(); // verbinding verbreken als client sluit
+        proxyReq.destroy(); // client gesloten = kap verbinding
     });
 
     proxyReq.on('error', () => {
         res.status(502).send('Stream fout');
     });
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Proxy actief op poort ${PORT}`));
